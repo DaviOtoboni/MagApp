@@ -1,3 +1,5 @@
+import { env, isBuildTime } from '@/lib/env'
+
 /**
  * Supabase Configuration Validator
  * Validates that all required environment variables are present and properly formatted
@@ -11,10 +13,20 @@ interface SupabaseConfig {
 }
 
 export function validateSupabaseConfig(): SupabaseConfig {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+  // Skip validation during build time
+  if (isBuildTime) {
+    return {
+      url: env.NEXT_PUBLIC_SUPABASE_URL,
+      anonKey: env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
+      appUrl: env.NEXT_PUBLIC_APP_URL
+    }
+  }
+
+  const url = env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY
+  const appUrl = env.NEXT_PUBLIC_APP_URL
 
   // Check required variables
   if (!url) {
