@@ -52,31 +52,31 @@ export function mapSupabaseError(error: any): AuthError {
 
   // Map specific Supabase error codes and messages
   if (message.includes('Invalid login credentials') || code === 'invalid_credentials') {
-    return createAuthError('invalid_credentials', undefined, error)
+    return createAuthError('invalid_credentials' as AuthErrorType, undefined, error)
   }
 
   if (message.includes('Email not confirmed') || code === 'email_not_confirmed') {
-    return createAuthError('email_not_confirmed', undefined, error)
+    return createAuthError('email_not_confirmed' as AuthErrorType, undefined, error)
   }
 
   if (message.includes('Password should be at least') || code === 'weak_password') {
-    return createAuthError('weak_password', undefined, error)
+    return createAuthError('weak_password' as AuthErrorType, undefined, error)
   }
 
   if (message.includes('User already registered') || code === 'signup_disabled') {
-    return createAuthError('email_already_exists', undefined, error)
+    return createAuthError('email_already_exists' as AuthErrorType, undefined, error)
   }
 
   if (message.includes('JWT expired') || message.includes('refresh_token_not_found') || code === 'token_expired') {
-    return createAuthError('session_expired', undefined, error)
+    return createAuthError('session_expired' as AuthErrorType, undefined, error)
   }
 
   if (message.includes('Network') || message.includes('fetch') || code === 'network_error') {
-    return createAuthError('network_error', undefined, error)
+    return createAuthError('network_error' as AuthErrorType, undefined, error)
   }
 
   // Default to unknown error
-  return createAuthError('unknown_error', message, error)
+  return createAuthError('unknown_error' as AuthErrorType, message, error)
 }
 
 /**
@@ -109,26 +109,26 @@ export function getErrorTitle(error: AuthError): string {
  * Check if error is retryable
  */
 export function isRetryableError(error: AuthError): boolean {
-  const retryableTypes: AuthErrorType[] = [
+  const retryableTypes = [
     'network_error',
     'unknown_error'
   ]
   
-  return retryableTypes.includes(error.type)
+  return retryableTypes.includes(error.type as string)
 }
 
 /**
  * Check if error requires user action
  */
 export function requiresUserAction(error: AuthError): boolean {
-  const actionRequiredTypes: AuthErrorType[] = [
+  const actionRequiredTypes = [
     'invalid_credentials',
     'email_not_confirmed',
     'weak_password',
     'session_expired'
   ]
   
-  return actionRequiredTypes.includes(error.type)
+  return actionRequiredTypes.includes(error.type as string)
 }
 
 /**

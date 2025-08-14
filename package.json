@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "build:check": "next build --no-lint",
+    "build:safe": "next build --no-lint",
     "dev": "next dev",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "start": "next start",
     "setup:supabase": "node scripts/setup-supabase.js",
-    "postbuild": "echo 'Build completed successfully'"
+    "type-check": "tsc --noEmit",
+    "postbuild": "echo 'Build concluído com sucesso'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -16,7 +16,7 @@ import type { AuthContextType, AuthUser, AuthSession, AuthError, SignInData, Sig
 import type { Profile } from '@/types/database'
 import type { User, Session } from '@supabase/supabase-js'
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       const enhancedUser: AuthUser = {
         ...authUser,
-        profile: userProfile
+        profile: userProfile || undefined
       }
 
       const enhancedSession: AuthSession = {
@@ -203,8 +203,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Update auth metadata
       if (data.name || data.avatar_url) {
         const { error: authError } = await authUpdateProfile({
-          name: data.name,
-          avatar_url: data.avatar_url
+          name: data.name || undefined,
+          avatar_url: data.avatar_url || undefined
         })
 
         if (authError) {

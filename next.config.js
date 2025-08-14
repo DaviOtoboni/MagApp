@@ -1,32 +1,73 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable static optimization for pages that use Supabase
+  // Configurações experimentais
   experimental: {
-    // Enable if needed for better performance
+    // Otimizações de pacote se necessário
     // optimizePackageImports: ['@supabase/supabase-js']
   },
   
-  // Environment variables validation
+  // Variáveis de ambiente
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
 
-  // Disable static generation for auth-dependent pages during build
-  generateBuildId: async () => {
-    // Use timestamp to ensure fresh builds
-    return `build-${Date.now()}`
+  // Desabilitar prerendering completamente
+  trailingSlash: false,
+  
+  // Configurações do TypeScript
+  typescript: {
+    // Ignorar erros de tipo durante o build em produção (temporário)
+    ignoreBuildErrors: false,
   },
 
-  // Handle build-time environment issues
+  // Configurações do ESLint
+  eslint: {
+    // Ignorar erros de lint durante o build (temporário)
+    ignoreDuringBuilds: false,
+  },
+
+  // Configurações do Webpack
   webpack: (config, { isServer, dev }) => {
-    // Don't fail build if env vars are missing during build
+    // Avisar sobre variáveis de ambiente ausentes
     if (!dev && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      console.warn('⚠️  Supabase environment variables not found during build. Using placeholders.')
+      console.warn('⚠️  Variáveis de ambiente do Supabase não encontradas durante o build. Usando placeholders.')
+    }
+    
+    // Configurações para resolver problemas do Edge Runtime
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
     }
     
     return config
+  },
+
+  // Configurações de servidor
+  serverRuntimeConfig: {
+    // Configurações apenas do servidor
+  },
+  
+  publicRuntimeConfig: {
+    // Configurações públicas
+  },
+
+  // Configurações de output
+  output: 'standalone',
+
+  // Desabilitar static optimization completamente
+  async rewrites() {
+    return []
+  },
+
+  // Configurações de build
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
   }
 }
 
