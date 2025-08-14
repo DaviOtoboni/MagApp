@@ -1,190 +1,152 @@
-"use client"
+'use client'
 
-import { Navigation } from "@/components/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { BookOpen, Play, Gamepad2, Plus, TrendingUp } from "lucide-react"
-import Link from "next/link"
-import { useMangas } from "@/hooks/use-mangas"
-import { useAnimes } from "@/hooks/use-animes"
-import { useJogos } from "@/hooks/use-jogos"
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ShowWhenAuthenticated, ShowWhenUnauthenticated } from '@/components/auth/ConditionalRender'
+import { useUserDisplay } from '@/hooks/useUser'
+import { Shield, Zap, Users, ArrowRight } from 'lucide-react'
 
-export default function Dashboard() {
-  const { getStats: getMangaStats } = useMangas()
-  const { getStats: getAnimeStats } = useAnimes()
-  const { getStats: getJogoStats } = useJogos()
+export default function HomePage() {
+  return (
+    <div className="container mx-auto px-4 py-16 space-y-16">
+      <HeroSection />
+      <FeaturesSection />
+      <CTASection />
+    </div>
+  )
+}
 
-  const mangaStats = getMangaStats()
-  const animeStats = getAnimeStats()
-  const jogoStats = getJogoStats()
+function HeroSection() {
+  const { displayName } = useUserDisplay()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <Navigation />
-
-      <main className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Bem-vindo à sua Coleção Otaku
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Organize e acompanhe seus mangás, animes e jogos favoritos em um só lugar
+    <section className="text-center space-y-8">
+      <div className="space-y-4">
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+          Bem-vindo ao{' '}
+          <span className="text-primary">MagApp</span>
+        </h1>
+        
+        <ShowWhenAuthenticated>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Olá, {displayName}! Que bom ter você de volta.
           </p>
-        </div>
+        </ShowWhenAuthenticated>
+        
+        <ShowWhenUnauthenticated>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Sua aplicação completa com autenticação segura e interface moderna.
+          </p>
+        </ShowWhenUnauthenticated>
+      </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="border-l-4 border-l-primary">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Mangás</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{mangaStats.total}</div>
-              <p className="text-xs text-muted-foreground">
-                {mangaStats.lendo} lendo • {mangaStats.completos} completos
-              </p>
-            </CardContent>
-          </Card>
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <ShowWhenAuthenticated>
+          <Button size="lg" asChild>
+            <Link href="/dashboard">
+              Ir para Dashboard
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          <Button size="lg" variant="outline" asChild>
+            <Link href="/profile">Ver Perfil</Link>
+          </Button>
+        </ShowWhenAuthenticated>
 
-          <Card className="border-l-4 border-l-accent">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Animes</CardTitle>
-              <Play className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{animeStats.total}</div>
-              <p className="text-xs text-muted-foreground">
-                {animeStats.assistindo} assistindo • {animeStats.completos} completos
-              </p>
-            </CardContent>
-          </Card>
+        <ShowWhenUnauthenticated>
+          <Button size="lg" asChild>
+            <Link href="/register">
+              Começar Agora
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          <Button size="lg" variant="outline" asChild>
+            <Link href="/login">Fazer Login</Link>
+          </Button>
+        </ShowWhenUnauthenticated>
+      </div>
+    </section>
+  )
+}
 
-          <Card className="border-l-4 border-l-special">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Jogos</CardTitle>
-              <Gamepad2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{jogoStats.total}</div>
-              <p className="text-xs text-muted-foreground">
-                {jogoStats.jogando} jogando • {jogoStats.completos} completos
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+function FeaturesSection() {
+  const features = [
+    {
+      icon: Shield,
+      title: 'Segurança Avançada',
+      description: 'Autenticação robusta com Supabase, incluindo confirmação por email e reset de senha.'
+    },
+    {
+      icon: Zap,
+      title: 'Performance Otimizada',
+      description: 'Construído com Next.js 15 e React 19 para máxima velocidade e eficiência.'
+    },
+    {
+      icon: Users,
+      title: 'Experiência do Usuário',
+      description: 'Interface moderna e intuitiva com feedback em tempo real e estados de loading.'
+    }
+  ]
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
+  return (
+    <section className="space-y-8">
+      <div className="text-center space-y-4">
+        <h2 className="text-3xl font-bold tracking-tight">
+          Por que escolher o MagApp?
+        </h2>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Desenvolvido com as melhores práticas e tecnologias modernas.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {features.map((feature, index) => (
+          <Card key={index} className="text-center">
             <CardHeader>
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                  <BookOpen className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Mangás</CardTitle>
-                  <CardDescription>Gerencie sua biblioteca de mangás</CardDescription>
-                </div>
+              <div className="mx-auto w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <feature.icon className="h-6 w-6 text-primary" />
               </div>
+              <CardTitle>{feature.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex space-x-2">
-                <Button asChild size="sm" className="flex-1">
-                  <Link href="/mangas">
-                    <TrendingUp className="w-4 h-4 mr-2" />
-                    Ver Coleção
-                  </Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/mangas/novo">
-                    <Plus className="w-4 h-4" />
-                  </Link>
-                </Button>
-              </div>
+              <CardDescription>{feature.description}</CardDescription>
             </CardContent>
           </Card>
+        ))}
+      </div>
+    </section>
+  )
+}
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
-                  <Play className="h-6 w-6 text-accent" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Animes</CardTitle>
-                  <CardDescription>Acompanhe suas séries favoritas</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex space-x-2">
-                <Button asChild size="sm" variant="secondary" className="flex-1">
-                  <Link href="/animes">
-                    <TrendingUp className="w-4 h-4 mr-2" />
-                    Ver Coleção
-                  </Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/animes/novo">
-                    <Plus className="w-4 h-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-special/10 rounded-lg group-hover:bg-special/20 transition-colors">
-                  <Gamepad2 className="h-6 w-6 text-special" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Jogos</CardTitle>
-                  <CardDescription>Controle seu progresso nos games</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex space-x-2">
-                <Button
-                  asChild
-                  size="sm"
-                  variant="secondary"
-                  className="flex-1 bg-special/10 hover:bg-special/20 text-special border-special/20"
-                >
-                  <Link href="/jogos">
-                    <TrendingUp className="w-4 h-4 mr-2" />
-                    Ver Coleção
-                  </Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/jogos/novo">
-                    <Plus className="w-4 h-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity Placeholder */}
-        <Card>
+function CTASection() {
+  return (
+    <ShowWhenUnauthenticated>
+      <section className="text-center space-y-8">
+        <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle className="font-heading">Atividade Recente</CardTitle>
-            <CardDescription>Suas últimas adições e atualizações aparecerão aqui</CardDescription>
+            <CardTitle className="text-2xl">
+              Pronto para começar?
+            </CardTitle>
+            <CardDescription>
+              Crie sua conta gratuita e explore todas as funcionalidades.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-center py-12 text-muted-foreground">
-              <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Nenhuma atividade ainda</p>
-              <p className="text-sm">Comece adicionando alguns títulos à sua coleção!</p>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" asChild>
+                <Link href="/register">Criar Conta Gratuita</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/login">Já tenho conta</Link>
+              </Button>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Sem compromisso. Cancele quando quiser.
+            </p>
           </CardContent>
         </Card>
-      </main>
-    </div>
+      </section>
+    </ShowWhenUnauthenticated>
   )
 }
