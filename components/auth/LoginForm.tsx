@@ -190,7 +190,7 @@ export function LoginForm({ onSuccess, redirectTo, className }: LoginFormProps) 
           <div className="text-center text-sm text-muted-foreground">
             Não tem uma conta?{' '}
             <Link
-              href="/auth/register"
+              href="/register"
               className="text-primary hover:underline font-medium"
             >
               Cadastre-se

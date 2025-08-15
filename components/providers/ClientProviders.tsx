@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 interface ClientProvidersProps {
   children: React.ReactNode
@@ -26,10 +28,19 @@ export function ClientProviders({ children }: ClientProvidersProps) {
 
   // Renderizar versão completa no cliente
   return (
-    <div className="min-h-screen bg-background">
-      <main>
-        {children}
-      </main>
-    </div>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <AuthProvider>
+        <div className="min-h-screen bg-background">
+          <main>
+            {children}
+          </main>
+        </div>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
