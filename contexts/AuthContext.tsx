@@ -27,6 +27,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [session, setSession] = useState<AuthSession | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   // Load user profile from database
   const loadUserProfile = useCallback(async (userId: string) => {
@@ -74,8 +75,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [loadUserProfile])
 
+  // Initialize client-side flag
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   // Initialize auth state
   useEffect(() => {
+    if (!isClient) return
+
     let mounted = true
 
     const initializeAuth = async () => {
@@ -119,7 +127,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       mounted = false
       subscription.unsubscribe()
     }
-  }, [updateUserState])
+  }, [updateUserState, isClient])
 
   // Sign in function
   const signIn = useCallback(async (email: string, password: string): Promise<void> => {

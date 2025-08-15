@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -8,10 +9,23 @@ import { ThemeToggle } from '@/components/ui/theme-toggle'
 export const dynamic = 'force-dynamic'
 
 export default function ForgotPasswordPage() {
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSuccess = (email: string) => {
     // Opcional: redirecionar ou mostrar mensagem adicional
+  }
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (

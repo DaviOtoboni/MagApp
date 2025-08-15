@@ -44,6 +44,8 @@ export async function signInWithEmail(data: SignInData): Promise<{ user: User | 
  */
 export async function signUpWithEmail(data: SignUpData): Promise<{ user: User | null; error: AuthError | null }> {
   try {
+    console.log('Attempting to sign up with:', { email: data.email, hasPassword: !!data.password })
+    
     const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -53,6 +55,8 @@ export async function signUpWithEmail(data: SignUpData): Promise<{ user: User | 
         }
       }
     })
+
+    console.log('Supabase signUp response:', { authData, error })
 
     if (error) {
       return {
@@ -66,6 +70,7 @@ export async function signUpWithEmail(data: SignUpData): Promise<{ user: User | 
       error: null
     }
   } catch (error) {
+    console.error('SignUp catch error:', error)
     return {
       user: null,
       error: {

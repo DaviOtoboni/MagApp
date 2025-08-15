@@ -2,10 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import { env, validateEnvVars } from '@/lib/env'
 
-// Validate environment variables (only in runtime)
-if (typeof window !== 'undefined') {
-  validateEnvVars()
-}
+// Environment variables are validated when accessed
 
 // Client-side Supabase client
 export const supabase = createClient<Database>(
@@ -17,6 +14,11 @@ export const supabase = createClient<Database>(
       persistSession: true,
       detectSessionInUrl: true,
       flowType: 'pkce'
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'supabase-js-web'
+      }
     }
   }
 )

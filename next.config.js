@@ -6,12 +6,7 @@ const nextConfig = {
     // optimizePackageImports: ['@supabase/supabase-js']
   },
   
-  // Variáveis de ambiente
-  env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-  },
+  // Variáveis de ambiente são carregadas automaticamente do .env.local
 
   // Desabilitar prerendering completamente
   trailingSlash: false,
