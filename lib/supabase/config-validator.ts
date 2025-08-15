@@ -1,4 +1,4 @@
-import { env, isBuildTime } from '@/lib/env'
+import { env } from '@/lib/env'
 
 /**
  * Supabase Configuration Validator
@@ -13,15 +13,6 @@ interface SupabaseConfig {
 }
 
 export function validateSupabaseConfig(): SupabaseConfig {
-  // Skip validation during build time
-  if (isBuildTime) {
-    return {
-      url: env.NEXT_PUBLIC_SUPABASE_URL,
-      anonKey: env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
-      appUrl: env.NEXT_PUBLIC_APP_URL
-    }
-  }
 
   const url = env.NEXT_PUBLIC_SUPABASE_URL
   const anonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
