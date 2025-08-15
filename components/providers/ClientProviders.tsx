@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 interface ClientProvidersProps {
   children: React.ReactNode
@@ -13,12 +14,22 @@ export function ClientProviders({ children }: ClientProvidersProps) {
     setMounted(true)
   }, [])
 
-  // Always provide AuthProvider, but with loading state during SSR
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background">
+        <main>
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <main>
-        {children}
-      </main>
-    </div>
+    <AuthProvider>
+      {children}
+    </AuthProvider>
   )
 }

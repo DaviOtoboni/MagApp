@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { AuthProvider } from '@/contexts/AuthContext'
+import { ClientProviders } from '@/components/providers/ClientProviders'
 import { ErrorBoundary } from '@/lib/errors/error-boundary'
 import { Header } from '@/components/layout/Header'
 import { Toaster } from 'sonner'
@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={inter.className}>
         <ErrorBoundary>
-          <AuthProvider>
+          <ClientProviders>
             <div className="min-h-screen bg-background">
               <Header />
               <main>
@@ -35,7 +35,7 @@ export default function RootLayout({
                 duration: 4000,
               }}
             />
-          </AuthProvider>
+          </ClientProviders>
         </ErrorBoundary>
       </body>
     </html>
