@@ -1,33 +1,52 @@
 'use client'
 
-// Força renderização apenas no cliente
-export const dynamic = 'force-dynamic'
+import { useState } from 'react'
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import { ProfileCard } from '@/components/profile/ProfileCard'
+import { ProfileEditForm } from '@/components/profile/ProfileEditForm'
+import { ChangePasswordForm } from '@/components/profile/ChangePasswordForm'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function ProfilePage() {
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Perfil</h1>
-          <p className="text-muted-foreground">
-            Gerencie suas informações pessoais.
-          </p>
-        </div>
+  const [isEditing, setIsEditing] = useState(false)
 
-        <div className="p-6 bg-card rounded-lg border">
-          <h3 className="font-semibold mb-4">Informações do Usuário</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Nome</label>
-              <p className="text-sm mt-1">Usuário Exemplo</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Email</label>
-              <p className="text-sm mt-1">usuario@exemplo.com</p>
-            </div>
+  return (
+    <ProtectedRoute>
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="space-y-8">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">Perfil</h1>
+            <p className="text-muted-foreground">
+              Gerencie suas informações pessoais e configurações de segurança.
+            </p>
           </div>
+
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="profile">Informações Pessoais</TabsTrigger>
+              <TabsTrigger value="security">Segurança</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="profile" className="space-y-6">
+              {isEditing ? (
+                <ProfileEditForm
+                  onSuccess={() => setIsEditing(false)}
+                  onCancel={() => setIsEditing(false)}
+                />
+              ) : (
+                <ProfileCard
+                  onEdit={() => setIsEditing(true)}
+                  showEditButton={true}
+                />
+              )}
+            </TabsContent>
+
+            <TabsContent value="security" className="space-y-6">
+              <ChangePasswordForm />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   )
 }

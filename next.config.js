@@ -1,68 +1,32 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configurações experimentais
+  // Disable static optimization for pages that use Supabase
   experimental: {
-    // Otimizações de pacote se necessário
+    // Enable if needed for better performance
     // optimizePackageImports: ['@supabase/supabase-js']
   },
   
-  // Variáveis de ambiente são carregadas automaticamente do .env.local
-
-  // Desabilitar prerendering completamente
-  trailingSlash: false,
-  
-  // Configurações do TypeScript
-  typescript: {
-    // Ignorar erros de tipo durante o build em produção (temporário)
-    ignoreBuildErrors: false,
+  // Environment variables validation
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
 
-  // Configurações do ESLint
-  eslint: {
-    // Ignorar erros de lint durante o build (temporário)
-    ignoreDuringBuilds: false,
+  // Disable static generation for auth-dependent pages during build
+  generateBuildId: async () => {
+    // Use timestamp to ensure fresh builds
+    return `build-${Date.now()}`
   },
 
-  // Configurações do Webpack
+  // Handle build-time environment issues
   webpack: (config, { isServer, dev }) => {
-    // Avisar sobre variáveis de ambiente ausentes
+    // Don't fail build if env vars are missing during build
     if (!dev && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      console.warn('⚠️  Variáveis de ambiente do Supabase não encontradas durante o build. Usando placeholders.')
-    }
-    
-    // Configurações para resolver problemas do Edge Runtime
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      }
+      console.warn('⚠️  Supabase environment variables not found during build. Using placeholders.')
     }
     
     return config
-  },
-
-  // Configurações de servidor
-  serverRuntimeConfig: {
-    // Configurações apenas do servidor
-  },
-  
-  publicRuntimeConfig: {
-    // Configurações públicas
-  },
-
-  // Configurações de output
-  output: 'standalone',
-
-  // Desabilitar static optimization completamente
-  async rewrites() {
-    return []
-  },
-
-  // Configurações de build
-  generateBuildId: async () => {
-    return 'build-' + Date.now()
   }
 }
 
