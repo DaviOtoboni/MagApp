@@ -1,13 +1,38 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShowWhenAuthenticated, ShowWhenUnauthenticated } from '@/components/auth/ConditionalRender'
 import { useUserDisplay } from '@/hooks/useUser'
-import { Shield, Zap, Users, ArrowRight } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { Shield, Zap, Users, ArrowRight, TestTube } from 'lucide-react'
 
 export default function HomePage() {
+  const router = useRouter()
+  const { user, loading } = useAuth()
+
+  // Redirecionar automaticamente para o dashboard se estiver autenticado
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/dashboard')
+    }
+  }, [user, loading, router])
+
+  // Mostrar loading enquanto verifica autenticação
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    )
+  }
+
+  // Se não estiver autenticado, mostrar página de boas-vindas
   return (
     <div className="container mx-auto px-4 py-16 space-y-16">
       <HeroSection />
@@ -42,27 +67,10 @@ function HeroSection() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <ShowWhenAuthenticated>
-          <Button size="lg" asChild>
-            <Link href="/dashboard">
-              Ir para Dashboard
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/profile">Ver Perfil</Link>
-          </Button>
-        </ShowWhenAuthenticated>
-
         <ShowWhenUnauthenticated>
-          <Button size="lg" asChild>
-            <Link href="/register">
-              Começar Agora
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+          <TestUserButton />
           <Button size="lg" variant="outline" asChild>
-            <Link href="/login">Fazer Login</Link>
+            <Link href="/register">Criar Conta</Link>
           </Button>
         </ShowWhenUnauthenticated>
       </div>
@@ -119,6 +127,24 @@ function FeaturesSection() {
   )
 }
 
+function TestUserButton() {
+  const { signInAsTestUser } = useAuth()
+  const router = useRouter()
+
+  const handleTestLogin = () => {
+    signInAsTestUser()
+    router.push('/dashboard')
+  }
+
+  return (
+    <Button size="lg" onClick={handleTestLogin} className="bg-green-600 hover:bg-green-700">
+      <TestTube className="mr-2 h-4 w-4" />
+      Entrar como Teste
+      <ArrowRight className="ml-2 h-4 w-4" />
+    </Button>
+  )
+}
+
 function CTASection() {
   return (
     <ShowWhenUnauthenticated>
@@ -129,20 +155,18 @@ function CTASection() {
               Pronto para começar?
             </CardTitle>
             <CardDescription>
-              Crie sua conta gratuita e explore todas as funcionalidades.
+              Teste a aplicação ou crie sua conta gratuita.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild>
-                <Link href="/register">Criar Conta Gratuita</Link>
-              </Button>
+              <TestUserButton />
               <Button size="lg" variant="outline" asChild>
-                <Link href="/login">Já tenho conta</Link>
+                <Link href="/register">Criar Conta</Link>
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Sem compromisso. Cancele quando quiser.
+              Use o usuário de teste para explorar todas as funcionalidades.
             </p>
           </CardContent>
         </Card>

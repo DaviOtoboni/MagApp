@@ -21,6 +21,7 @@ export interface AuthContextType {
   updatePassword: (password: string) => Promise<void>
   updateProfile: (data: Partial<Profile>) => Promise<void>
   refreshSession: () => Promise<void>
+  signInAsTestUser: () => void
 }
 
 export enum AuthErrorType {

@@ -16,7 +16,7 @@ import type { AuthContextType, AuthUser, AuthSession, AuthError, SignInData, Sig
 import type { Profile } from '@/types/database'
 import type { User, Session } from '@supabase/supabase-js'
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -28,6 +28,75 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<AuthSession | null>(null)
   const [loading, setLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
+
+  // Usuário de teste
+  const createTestUser = useCallback(() => {
+    const testUser: AuthUser = {
+      id: 'test-user-123',
+      email: 'teste@magapp.com',
+      user_metadata: {
+        name: 'Usuário de Teste',
+        avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test'
+      },
+      app_metadata: {},
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
+      profile: {
+        id: 'test-user-123',
+        name: 'Usuário de Teste',
+        email: 'teste@magapp.com',
+        avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    }
+
+    const testSession: AuthSession = {
+      access_token: 'test-access-token',
+      refresh_token: 'test-refresh-token',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      token_type: 'bearer',
+      user: testUser
+    }
+
+    return { testUser, testSession }
+  }, [])
+
+  // Função para fazer login como usuário de teste
+  const signInAsTestUser = useCallback(() => {
+    const { testUser, testSession } = createTestUser()
+    
+    setUser(testUser)
+    setProfile(testUser.profile!)
+    setSession(testSession)
+    setLoading(false)
+
+    // Salvar no localStorage para persistir entre reloads
+    localStorage.setItem('test-user-session', JSON.stringify({
+      user: testUser,
+      profile: testUser.profile,
+      session: testSession
+    }))
+  }, [createTestUser])
+
+  // Verificar se existe sessão de teste no localStorage
+  const checkTestUserSession = useCallback(() => {
+    try {
+      const savedSession = localStorage.getItem('test-user-session')
+      if (savedSession) {
+        const { user: savedUser, profile: savedProfile, session: savedSession } = JSON.parse(savedSession)
+        setUser(savedUser)
+        setProfile(savedProfile)
+        setSession(savedSession)
+        return true
+      }
+    } catch (error) {
+      console.error('Erro ao carregar sessão de teste:', error)
+      localStorage.removeItem('test-user-session')
+    }
+    return false
+  }, [])
 
   // Load user profile from database
   const loadUserProfile = useCallback(async (userId: string) => {
@@ -88,6 +157,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const initializeAuth = async () => {
       try {
+        // Primeiro, verificar se existe usuário de teste
+        if (checkTestUserSession()) {
+          if (mounted) {
+            setLoading(false)
+          }
+          return
+        }
+
+        // Se não há usuário de teste, tentar autenticação normal
         const { session: currentSession } = await getCurrentSession()
         
         if (mounted) {
@@ -170,13 +248,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setLoading(true)
     
     try {
+      // Limpar sessão de teste se existir
+      localStorage.removeItem('test-user-session')
+      
       const { error } = await authSignOut()
       
       if (error) {
         throw new Error(error.message)
       }
 
-      // User state will be updated by the auth state change listener
+      // Limpar estado local
+      setUser(null)
+      setProfile(null)
+      setSession(null)
+      setLoading(false)
     } catch (error) {
       setLoading(false)
       throw error
@@ -268,7 +353,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     resetPassword,
     updatePassword,
     updateProfile,
-    refreshSession: refreshSessionFn
+    refreshSession: refreshSessionFn,
+    signInAsTestUser
   }
 
   return (

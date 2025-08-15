@@ -6,6 +6,7 @@ import { ShowWhenAuthenticated } from '@/components/auth/ConditionalRender'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useUserDisplay } from '@/hooks/useUser'
+import { useAuth } from '@/hooks/useAuth'
 import { BarChart3, Users, Activity, TrendingUp } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -29,18 +30,30 @@ export default function DashboardPage() {
 
 function DashboardHeader() {
   const { displayName } = useUserDisplay()
+  const { user } = useAuth()
+  const isTestUser = user?.id === 'test-user-123'
 
   return (
     <div className="space-y-2">
-      <h1 className="text-3xl font-bold tracking-tight">
-        <ShowWhenAuthenticated
-          loadingFallback={<div className="h-9 w-64 bg-muted animate-pulse rounded" />}
-        >
-          Bem-vindo, {displayName}!
-        </ShowWhenAuthenticated>
-      </h1>
+      <div className="flex items-center gap-3">
+        <h1 className="text-3xl font-bold tracking-tight">
+          <ShowWhenAuthenticated
+            loadingFallback={<div className="h-9 w-64 bg-muted animate-pulse rounded" />}
+          >
+            Bem-vindo, {displayName}!
+          </ShowWhenAuthenticated>
+        </h1>
+        {isTestUser && (
+          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            Usuário de Teste
+          </span>
+        )}
+      </div>
       <p className="text-muted-foreground">
-        Aqui está um resumo da sua atividade hoje.
+        {isTestUser
+          ? 'Você está usando um usuário de teste. Explore todas as funcionalidades!'
+          : 'Aqui está um resumo da sua atividade hoje.'
+        }
       </p>
     </div>
   )
@@ -90,9 +103,8 @@ function DashboardStats() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stat.value}</div>
-            <p className={`text-xs ${
-              stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-            }`}>
+            <p className={`text-xs ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+              }`}>
               {stat.change} em relação ao mês passado
             </p>
           </CardContent>

@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ClientProviders } from '@/components/providers/ClientProviders'
 import { ErrorBoundary } from '@/lib/errors/error-boundary'
-import { Header } from '@/components/layout/Header'
 import { Toaster } from 'sonner'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -23,19 +22,14 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <ClientProviders>
-            <div className="min-h-screen bg-background">
-              <Header />
-              <main>
-                {children}
-              </main>
-            </div>
-            <Toaster 
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-              }}
-            />
+            {children}
           </ClientProviders>
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+            }}
+          />
         </ErrorBoundary>
       </body>
     </html>

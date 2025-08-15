@@ -2,6 +2,9 @@
  * Environment utilities - Railway configuration
  */
 
+// Check if we're in build time
+export const isBuildTime = process.env.NODE_ENV === 'production' && !process.env.VERCEL && !process.env.RAILWAY_ENVIRONMENT
+
 export const validateEnvVars = () => {
   const required = [
     'NEXT_PUBLIC_SUPABASE_URL',

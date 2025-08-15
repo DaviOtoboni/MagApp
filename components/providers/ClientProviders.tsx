@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { Header } from '@/components/layout/Header'
 
 interface ClientProvidersProps {
   children: React.ReactNode
@@ -29,7 +30,12 @@ export function ClientProviders({ children }: ClientProvidersProps) {
 
   return (
     <AuthProvider>
-      {children}
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main>
+          {children}
+        </main>
+      </div>
     </AuthProvider>
   )
 }
