@@ -1,5 +1,6 @@
+'use client'
+
 import type React from "react"
-import type { Metadata } from "next"
 import { Space_Grotesk, DM_Sans } from "next/font/google"
 import "./globals.css"
 
@@ -15,11 +16,7 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 })
 
-export const metadata: Metadata = {
-  title: "Minha Coleção Otaku",
-  description: "Gerencie sua coleção de mangás, animes e jogos",
-  generator: "v0.dev",
-}
+// Metadata moved to head.tsx or individual pages since this is now a client component
 
 export default function RootLayout({
   children,
@@ -28,7 +25,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${spaceGrotesk.variable} ${dmSans.variable} antialiased`}>
-      <body className="font-sans">{children}</body>
+      <head>
+        <title>Minha Coleção Otaku</title>
+        <meta name="description" content="Gerencie sua coleção de mangás, animes e jogos" />
+      </head>
+      <body className="font-sans" suppressHydrationWarning>
+        <div className="min-h-screen bg-background">
+          <main>{children}</main>
+        </div>
+      </body>
     </html>
   )
 }
