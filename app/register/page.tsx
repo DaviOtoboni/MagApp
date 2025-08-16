@@ -40,8 +40,8 @@ export default function RegisterPage() {
 
   if (showConfirmation) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-black/20"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/40"></div>
         <div className="absolute inset-0 opacity-10">
           <div className="h-full w-full bg-white bg-opacity-5 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
         </div>
@@ -62,7 +62,7 @@ export default function RegisterPage() {
             <div className="space-y-4">
               <Button
                 onClick={() => router.push('/login')}
-                className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                className="w-full py-4 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
               >
                 Fazer Login
               </Button>
@@ -70,7 +70,7 @@ export default function RegisterPage() {
               <Button
                 onClick={() => setShowConfirmation(false)}
                 variant="outline"
-                className="w-full py-4 border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:text-purple-600 transition-all duration-200"
+                className="w-full py-4 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:text-gray-900 transition-all duration-200"
               >
                 Voltar ao cadastro
               </Button>
@@ -82,9 +82,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-black/20"></div>
+      <div className="absolute inset-0 bg-black/40"></div>
       <div className="absolute inset-0 opacity-10">
         <div className="h-full w-full bg-white bg-opacity-5 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
       </div>
@@ -92,14 +92,12 @@ export default function RegisterPage() {
       <div className="relative w-full max-w-md">
         {/* Logo Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-2xl mb-6">
-            <Sparkles className="w-8 h-8 text-purple-500" />
-          </div>
+          
           <h1 className="text-4xl font-bold text-white mb-2">
-            Junte-se ao MagApp
+            Junte-se ao Mag
           </h1>
           <p className="text-white/80 text-lg">
-            Crie sua conta gratuita
+          Cadastre-se no Mag para catalogar seus mangás, animes e jogos, podendo comparar com seus amigos e muito mais.
           </p>
         </div>
 
@@ -123,7 +121,7 @@ export default function RegisterPage() {
           {/* Login Link */}
           <Link 
             href="/login"
-            className="w-full flex justify-center py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-700 font-medium hover:border-purple-300 hover:text-purple-600 transition-all duration-200 hover:shadow-md"
+            className="w-full flex justify-center py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-700 font-medium hover:border-gray-400 hover:text-gray-900 transition-all duration-200 hover:shadow-md"
           >
             Fazer login
           </Link>

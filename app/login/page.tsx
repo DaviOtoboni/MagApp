@@ -39,9 +39,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-black/20"></div>
+      <div className="absolute inset-0 bg-black/40"></div>
       <div className="absolute inset-0 opacity-10">
         <div className="h-full w-full bg-white bg-opacity-5 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
       </div>
@@ -49,16 +49,16 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md">
         {/* Logo Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-2xl mb-6">
-            <span className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-              M
+          <div className="inline-flex items-center justify-center w-24 h-20 bg-white rounded-2xl shadow-2xl mb-6">
+            <span className="text-2xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+              Mag
             </span>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">
-            Bem-vindo de volta
+            Bem-vindo
           </h1>
           <p className="text-white/80 text-lg">
-            Entre na sua conta MagApp
+            Entre na sua conta
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export default function LoginPage() {
           {/* Register Link */}
           <Link 
             href="/register"
-            className="w-full flex justify-center py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-700 font-medium hover:border-orange-300 hover:text-orange-600 transition-all duration-200 hover:shadow-md"
+            className="w-full flex justify-center py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-700 font-medium hover:border-gray-400 hover:text-gray-900 transition-all duration-200 hover:shadow-md"
           >
             Criar conta gratuita
           </Link>

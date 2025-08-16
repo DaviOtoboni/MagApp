@@ -42,7 +42,7 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-              Bem-vindo, {user.name}!
+              Bem-vindo, {user.nickname || user.name}!
             </h1>
             <p className="text-muted-foreground">
               Gerencie sua coleção de mangás, animes e jogos

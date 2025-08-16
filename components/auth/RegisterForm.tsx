@@ -12,6 +12,7 @@ interface RegisterFormProps {
 export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
   const [formData, setFormData] = useState({
     name: '',
+    nickname: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -24,10 +25,24 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    
+    // Format nickname: remove spaces and special characters, convert to lowercase
+    if (name === 'nickname') {
+      const formattedValue = value
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, '')
+        .slice(0, 20) // Limit to 20 characters
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: formattedValue
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +52,7 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
 
     try {
       // Basic validation
-      if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      if (!formData.name || !formData.nickname || !formData.email || !formData.password || !formData.confirmPassword) {
         setError('Por favor, preencha todos os campos')
         return
       }
@@ -52,8 +67,19 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
         return
       }
 
+      // Validate nickname
+      if (!/^[a-zA-Z0-9_]+$/.test(formData.nickname)) {
+        setError('O nickname deve conter apenas letras, números e underscore')
+        return
+      }
+
+      if (formData.nickname.length < 3) {
+        setError('O nickname deve ter pelo menos 3 caracteres')
+        return
+      }
+
       // Call register function from useAuth
-      const success = await register(formData.name, formData.email, formData.password)
+      const success = await register(formData.name, formData.nickname, formData.email, formData.password)
       
       if (success && onSuccess) {
         onSuccess()
@@ -92,10 +118,34 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+              className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
               placeholder="Digite seu nome completo"
             />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="nickname" className="block text-sm font-semibold text-gray-700">
+            Nickname
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span className="text-gray-400 font-mono text-sm">@</span>
+            </div>
+            <input
+              id="nickname"
+              name="nickname"
+              type="text"
+              value={formData.nickname}
+              onChange={handleChange}
+              required
+              className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+              placeholder="Como você quer ser chamado"
+            />
+          </div>
+          <p className="text-xs text-gray-500">
+            Este será seu nome de usuário dentro do app
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -113,7 +163,7 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+              className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
               placeholder="Digite seu email"
             />
           </div>
@@ -134,7 +184,7 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+              className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
               placeholder="Mínimo 6 caracteres"
             />
             <button
@@ -166,7 +216,7 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+              className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
               placeholder="Digite a senha novamente"
             />
             <button
@@ -186,7 +236,7 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-4 px-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          className="w-full py-4 px-6 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2"
         >
           {loading ? (
             <div className="flex items-center justify-center gap-2">

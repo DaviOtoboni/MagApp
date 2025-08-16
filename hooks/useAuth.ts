@@ -6,6 +6,7 @@ interface User {
   id: string
   email: string
   name?: string
+  nickname?: string
 }
 
 interface AuthState {
@@ -13,14 +14,15 @@ interface AuthState {
   loading: boolean
   login: (email: string, password: string) => Promise<boolean>
   logout: () => void
-  register: (name: string, email: string, password: string) => Promise<boolean>
+  register: (name: string, nickname: string, email: string, password: string) => Promise<boolean>
 }
 
 // Conta de teste
 const TEST_USER = {
   id: '1',
   email: 'teste@magapp.com',
-  name: 'Usuário Teste'
+  name: 'Usuário Teste',
+  nickname: 'teste_user'
 }
 
 const TEST_CREDENTIALS = {
@@ -70,7 +72,7 @@ export function useAuth(): AuthState {
     }
   }
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (name: string, nickname: string, email: string, password: string): Promise<boolean> => {
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -79,7 +81,8 @@ export function useAuth(): AuthState {
       const newUser = {
         id: Date.now().toString(),
         email,
-        name
+        name,
+        nickname
       }
       
       setUser(newUser)
