@@ -79,12 +79,17 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
       }
 
       // Call register function from useAuth
-      const success = await register(formData.name, formData.nickname, formData.email, formData.password)
-      
-      if (success && onSuccess) {
-        onSuccess()
-      } else if (!success) {
-        setError('Erro ao criar conta. Verifique se o email ou nickname já não estão em uso.')
+      try {
+        const success = await register(formData.name, formData.nickname, formData.email, formData.password)
+        
+        if (success && onSuccess) {
+          onSuccess()
+        } else if (!success) {
+          setError('Erro ao criar conta. Verifique se o email ou nickname já não estão em uso.')
+        }
+      } catch (registerError) {
+        console.error('Registration error:', registerError)
+        setError('Erro ao criar conta. Tente novamente.')
       }
     } catch (err) {
       setError('Erro ao criar conta. Tente novamente.')

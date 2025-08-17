@@ -98,13 +98,14 @@ export function useAuth(): AuthState {
   const register = async (name: string, nickname: string, email: string, password: string): Promise<boolean> => {
     try {
       // First, check if nickname is already taken
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
         .select('nickname')
         .eq('nickname', nickname)
         .single()
 
-      if (existingProfile) {
+      // Only throw error if we found an existing profile (not if no profile found)
+      if (existingProfile && !checkError) {
         throw new Error('Este nickname já está em uso')
       }
 
