@@ -105,14 +105,26 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight">
-            MagApp
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-black/40"></div>
+      <div className="absolute inset-0 opacity-10">
+        <div className="h-full w-full bg-white bg-opacity-5 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
+      </div>
+      
+      <div className="relative w-full max-w-md">
+        {/* Logo Section */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-24 h-20 bg-white rounded-2xl shadow-2xl mb-6">
+            <span className="text-2xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+              Mag
+            </span>
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Nova senha
           </h1>
-          <p className="mt-2 text-muted-foreground">
-            Redefinir sua senha
+          <p className="text-white/80 text-lg">
+            Defina uma nova senha para sua conta
           </p>
         </div>
         
@@ -120,6 +132,16 @@ export default function ResetPasswordPage() {
           onSuccess={handleResetSuccess}
           className="w-full"
         />
+        
+        {/* Footer Links */}
+        <div className="text-center mt-8">
+          <button 
+            onClick={() => router.push('/login')}
+            className="text-white/60 hover:text-white/80 text-sm transition-colors"
+          >
+            ← Voltar ao login
+          </button>
+        </div>
       </div>
     </div>
   )

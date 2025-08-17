@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+// Toast functionality removed for simplicity
 
 // Força renderização apenas no cliente
 export const dynamic = 'force-dynamic'
@@ -49,9 +49,9 @@ export default function AuthCallbackPage() {
           setState('success')
           
           if (type === 'signup') {
-            toast.success('Email confirmado com sucesso! Bem-vindo ao MagApp!')
+            console.log('Email confirmado com sucesso! Bem-vindo ao MagApp!')
           } else if (type === 'recovery') {
-            toast.success('Email verificado! Você pode redefinir sua senha.')
+            console.log('Email verificado! Você pode redefinir sua senha.')
             router.push('/auth/reset-password')
             return
           }
@@ -69,7 +69,7 @@ export default function AuthCallbackPage() {
         
         const errorMessage = err instanceof Error ? err.message : 'Erro na confirmação'
         setError(errorMessage)
-        toast.error(errorMessage)
+        console.error(errorMessage)
       }
     }
 
@@ -78,11 +78,11 @@ export default function AuthCallbackPage() {
 
   if (state === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center px-4">
+        <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+              <Loader2 className="w-8 h-8 text-gray-600 animate-spin" />
             </div>
             <CardTitle>Confirmando email...</CardTitle>
             <CardDescription>
@@ -96,8 +96,8 @@ export default function AuthCallbackPage() {
 
   if (state === 'success') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center px-4">
+        <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-green-600" />
@@ -111,7 +111,7 @@ export default function AuthCallbackPage() {
           <CardContent className="text-center">
             <Button
               onClick={() => router.push('/dashboard')}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800"
             >
               Ir para o dashboard
             </Button>
@@ -122,8 +122,8 @@ export default function AuthCallbackPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center px-4">
+      <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
             <XCircle className="w-8 h-8 text-red-600" />
@@ -155,7 +155,7 @@ export default function AuthCallbackPage() {
             
             <Button
               onClick={() => router.push('/login')}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800"
             >
               Ir para login
             </Button>

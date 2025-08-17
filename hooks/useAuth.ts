@@ -1,71 +1,94 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-
-interface User {
-  id: string
-  email: string
-  name?: string
-  nickname?: string
-}
+import { supabase, type AuthUser, type Profile } from '@/lib/supabase/client'
 
 interface AuthState {
-  user: User | null
+  user: AuthUser | null
   loading: boolean
   login: (email: string, password: string) => Promise<boolean>
   logout: () => void
   register: (name: string, nickname: string, email: string, password: string) => Promise<boolean>
 }
 
-// Conta de teste
-const TEST_USER = {
-  id: '1',
-  email: 'teste@magapp.com',
-  name: 'Usuário Teste',
-  nickname: 'teste_user'
-}
-
-const TEST_CREDENTIALS = {
-  email: 'teste@magapp.com',
-  password: '123456'
-}
-
 export function useAuth(): AuthState {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user is logged in (localStorage)
-    const checkAuth = async () => {
+    // Get initial session
+    const getInitialSession = async () => {
       try {
-        const savedUser = localStorage.getItem('magapp_user')
-        if (savedUser) {
-          setUser(JSON.parse(savedUser))
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (session?.user) {
+          // Get user profile from database
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+
+          if (profile) {
+            setUser({
+              id: profile.id,
+              email: profile.email,
+              name: profile.name || undefined,
+              nickname: profile.nickname || undefined
+            })
+          }
         }
       } catch (error) {
-        console.error('Auth check failed:', error)
-        localStorage.removeItem('magapp_user')
+        console.error('Error getting session:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    checkAuth()
+    getInitialSession()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Get user profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+
+          if (profile) {
+            setUser({
+              id: profile.id,
+              email: profile.email,
+              name: profile.name || undefined,
+              nickname: profile.nickname || undefined
+            })
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null)
+        }
+        setLoading(false)
+      }
+    )
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Check test credentials
-      if (email === TEST_CREDENTIALS.email && password === TEST_CREDENTIALS.password) {
-        setUser(TEST_USER)
-        localStorage.setItem('magapp_user', JSON.stringify(TEST_USER))
-        return true
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        console.error('Login error:', error.message)
+        return false
       }
-      
-      return false
+
+      return !!data.user
     } catch (error) {
       console.error('Login failed:', error)
       return false
@@ -74,29 +97,49 @@ export function useAuth(): AuthState {
 
   const register = async (name: string, nickname: string, email: string, password: string): Promise<boolean> => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // For demo, just create a new user
-      const newUser = {
-        id: Date.now().toString(),
-        email,
-        name,
-        nickname
+      // First, check if nickname is already taken
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('nickname')
+        .eq('nickname', nickname)
+        .single()
+
+      if (existingProfile) {
+        throw new Error('Este nickname já está em uso')
       }
-      
-      setUser(newUser)
-      localStorage.setItem('magapp_user', JSON.stringify(newUser))
-      return true
+
+      // Register user with Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            nickname,
+            full_name: name
+          }
+        }
+      })
+
+      if (error) {
+        console.error('Registration error:', error.message)
+        return false
+      }
+
+      return !!data.user
     } catch (error) {
       console.error('Registration failed:', error)
       return false
     }
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem('magapp_user')
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut()
+      setUser(null)
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
   }
 
   return { user, loading, login, logout, register }

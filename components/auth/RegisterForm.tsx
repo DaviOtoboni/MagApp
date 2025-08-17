@@ -84,7 +84,7 @@ export function RegisterForm({ onSuccess, className }: RegisterFormProps) {
       if (success && onSuccess) {
         onSuccess()
       } else if (!success) {
-        setError('Erro ao criar conta. Tente novamente.')
+        setError('Erro ao criar conta. Verifique se o email ou nickname já não estão em uso.')
       }
     } catch (err) {
       setError('Erro ao criar conta. Tente novamente.')
