@@ -97,18 +97,6 @@ export function useAuth(): AuthState {
 
   const register = async (name: string, nickname: string, email: string, password: string): Promise<boolean> => {
     try {
-      // First, check if nickname is already taken
-      const { data: existingProfile, error: checkError } = await supabase
-        .from('profiles')
-        .select('nickname')
-        .eq('nickname', nickname)
-        .single()
-
-      // Only throw error if we found an existing profile (not if no profile found)
-      if (existingProfile && !checkError) {
-        throw new Error('Este nickname já está em uso')
-      }
-
       // Register user with Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -124,13 +112,35 @@ export function useAuth(): AuthState {
 
       if (error) {
         console.error('Registration error:', error.message)
-        return false
+        
+        // Handle specific error messages
+        if (error.message.includes('User already registered')) {
+          throw new Error('Este email já está cadastrado')
+        }
+        if (error.message.includes('already been taken')) {
+          throw new Error('Este nickname já está em uso')
+        }
+        if (error.message.includes('Password')) {
+          throw new Error('Senha deve ter pelo menos 6 caracteres')
+        }
+        if (error.message.includes('Invalid email')) {
+          throw new Error('Email inválido')
+        }
+        
+        throw new Error('Erro ao criar conta: ' + error.message)
       }
 
+      // If user was created successfully, the trigger will handle profile creation
       return !!data.user
     } catch (error) {
       console.error('Registration failed:', error)
-      return false
+      
+      // Re-throw the error so the component can handle it
+      if (error instanceof Error) {
+        throw error
+      }
+      
+      throw new Error('Erro ao criar conta. Tente novamente.')
     }
   }
 
