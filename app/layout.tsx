@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { Space_Grotesk, DM_Sans } from "next/font/google"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 import "./globals.css"
 
 const spaceGrotesk = Space_Grotesk({
@@ -30,9 +31,11 @@ export default function RootLayout({
         <meta name="description" content="Gerencie sua coleção de mangás, animes e jogos" />
       </head>
       <body className="font-sans" suppressHydrationWarning>
-        <div className="min-h-screen bg-background">
-          <main>{children}</main>
-        </div>
+        <ErrorBoundary>
+          <div className="min-h-screen bg-background">
+            <main>{children}</main>
+          </div>
+        </ErrorBoundary>
       </body>
     </html>
   )

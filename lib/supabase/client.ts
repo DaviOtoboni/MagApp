@@ -8,7 +8,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase environment variables are missing')
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+// Create client with error handling
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+})
+
+// Check if Supabase is properly configured
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey)
 
 // Types for our application
 export type Profile = Database['public']['Tables']['profiles']['Row']

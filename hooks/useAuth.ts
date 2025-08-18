@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase, type AuthUser, type Profile } from '@/lib/supabase/client'
+import { supabase, type AuthUser, type Profile, isSupabaseConfigured } from '@/lib/supabase/client'
 
 interface AuthState {
   user: AuthUser | null
@@ -16,32 +16,69 @@ export function useAuth(): AuthState {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let mounted = true
+
     // Get initial session
     const getInitialSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
-        
-        if (session?.user) {
-          // Get user profile from database
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
+        // Check if Supabase is configured
+        if (!isSupabaseConfigured) {
+          console.warn('Supabase not configured, skipping auth check')
+          if (mounted) setLoading(false)
+          return
+        }
 
-          if (profile) {
-            setUser({
-              id: profile.id,
-              email: profile.email,
-              name: profile.name || undefined,
-              nickname: profile.nickname || undefined
-            })
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError)
+          if (mounted) setLoading(false)
+          return
+        }
+        
+        if (session?.user && mounted) {
+          try {
+            // Get user profile from database
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+
+            if (profileError) {
+              console.error('Profile error:', profileError)
+              // If profile doesn't exist or can't be accessed, create basic user from auth
+              setUser({
+                id: session.user.id,
+                email: session.user.email || '',
+                name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
+                nickname: session.user.user_metadata?.nickname
+              })
+            } else if (profile && mounted) {
+              setUser({
+                id: profile.id,
+                email: profile.email,
+                name: profile.name || undefined,
+                nickname: profile.nickname || undefined
+              })
+            }
+          } catch (profileError) {
+            console.error('Error fetching profile:', profileError)
+            // Fallback to basic user info from auth
+            if (mounted) {
+              setUser({
+                id: session.user.id,
+                email: session.user.email || '',
+                name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
+                nickname: session.user.user_metadata?.nickname
+              })
+            }
           }
         }
       } catch (error) {
         console.error('Error getting session:', error)
       } finally {
-        setLoading(false)
+        if (mounted) setLoading(false)
       }
     }
 
@@ -50,30 +87,59 @@ export function useAuth(): AuthState {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-          // Get user profile
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
+        if (!mounted) return
 
-          if (profile) {
-            setUser({
-              id: profile.id,
-              email: profile.email,
-              name: profile.name || undefined,
-              nickname: profile.nickname || undefined
-            })
+        try {
+          if (event === 'SIGNED_IN' && session?.user) {
+            // Try to get user profile, but don't fail if it doesn't work
+            try {
+              const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single()
+
+              if (profile && !profileError) {
+                setUser({
+                  id: profile.id,
+                  email: profile.email,
+                  name: profile.name || undefined,
+                  nickname: profile.nickname || undefined
+                })
+              } else {
+                // Fallback to auth user data
+                setUser({
+                  id: session.user.id,
+                  email: session.user.email || '',
+                  name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
+                  nickname: session.user.user_metadata?.nickname
+                })
+              }
+            } catch (profileError) {
+              console.error('Profile fetch error:', profileError)
+              // Still set user with basic info
+              setUser({
+                id: session.user.id,
+                email: session.user.email || '',
+                name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
+                nickname: session.user.user_metadata?.nickname
+              })
+            }
+          } else if (event === 'SIGNED_OUT') {
+            setUser(null)
           }
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null)
+        } catch (error) {
+          console.error('Auth state change error:', error)
+        } finally {
+          setLoading(false)
         }
-        setLoading(false)
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
