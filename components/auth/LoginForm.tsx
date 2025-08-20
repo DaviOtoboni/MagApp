@@ -22,29 +22,44 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className }: L
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('📝 [LOGIN_FORM] Formulário submetido')
     setLoading(true)
     setError('')
 
     try {
       if (!email || !password) {
+        console.warn('⚠️ [LOGIN_FORM] Campos vazios detectados')
         setError('Por favor, preencha todos os campos')
         return
       }
 
+      console.log('✅ [LOGIN_FORM] Validação dos campos passou')
+      console.log('📧 [LOGIN_FORM] Email validado:', email)
+      console.log('🔑 [LOGIN_FORM] Senha validada:', password ? '***' : 'não fornecida')
+      
+      console.log('🔄 [LOGIN_FORM] Chamando hook useAuth.login...')
       const success = await login(email, password)
       
+      console.log('📊 [LOGIN_FORM] Resposta do login:', success ? 'sucesso' : 'falha')
+      
       if (success) {
+        console.log('🎉 [LOGIN_FORM] Login bem-sucedido, redirecionando...')
         if (onSuccess) {
+          console.log('🔄 [LOGIN_FORM] Executando callback onSuccess')
           onSuccess()
         } else {
+          console.log('🔄 [LOGIN_FORM] Redirecionando para:', redirectTo)
           router.push(redirectTo)
         }
       } else {
+        console.warn('⚠️ [LOGIN_FORM] Login falhou, exibindo erro')
         setError('Email ou senha incorretos')
       }
     } catch (err) {
+      console.error('❌ [LOGIN_FORM] Exceção durante login:', err)
       setError('Erro ao fazer login. Tente novamente.')
     } finally {
+      console.log('🏁 [LOGIN_FORM] Finalizando processo de login')
       setLoading(false)
     }
   }

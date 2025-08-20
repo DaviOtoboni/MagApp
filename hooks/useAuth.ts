@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase, type AuthUser, type Profile, isSupabaseConfigured } from '@/lib/supabase/client'
 
 interface AuthState {
@@ -14,156 +14,187 @@ interface AuthState {
 export function useAuth(): AuthState {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const mountedRef = useRef(true)
+  const sessionCheckedRef = useRef(false)
+
+  // Função para buscar perfil do usuário
+  const fetchUserProfile = useCallback(async (userId: string) => {
+    try {
+      console.log('📊 [AUTH] Buscando perfil do usuário...')
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (profileError) {
+        console.warn('⚠️ [AUTH] Erro ao buscar perfil:', profileError)
+        console.log('🔄 [AUTH] Usando dados básicos do auth como fallback')
+        return null
+      }
+
+      console.log('✅ [AUTH] Perfil encontrado:', { id: profile.id, name: profile.name, nickname: profile.nickname })
+      return profile
+    } catch (error) {
+      console.error('❌ [AUTH] Erro ao buscar perfil:', error)
+      return null
+    }
+  }, [])
+
+  // Função para criar usuário a partir de dados básicos
+  const createBasicUser = useCallback((sessionUser: any): AuthUser => {
+    return {
+      id: sessionUser.id,
+      email: sessionUser.email || '',
+      name: sessionUser.user_metadata?.name || sessionUser.user_metadata?.full_name,
+      nickname: sessionUser.user_metadata?.nickname
+    }
+  }, [])
 
   useEffect(() => {
-    let mounted = true
+    mountedRef.current = true
+    sessionCheckedRef.current = false
 
     // Get initial session
     const getInitialSession = async () => {
       try {
+        console.log('🔍 [AUTH] Verificando sessão inicial...')
+        
         // Check if Supabase is configured
         if (!isSupabaseConfigured) {
-          console.warn('Supabase not configured, skipping auth check')
-          if (mounted) setLoading(false)
+          console.warn('⚠️ [AUTH] Supabase não configurado, pulando verificação de auth')
+          if (mountedRef.current) setLoading(false)
           return
         }
 
+        console.log('✅ [AUTH] Supabase configurado, buscando sessão...')
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
         if (sessionError) {
-          console.error('Session error:', sessionError)
-          if (mounted) setLoading(false)
+          console.error('❌ [AUTH] Erro ao buscar sessão:', sessionError)
+          if (mountedRef.current) setLoading(false)
           return
         }
         
-        if (session?.user && mounted) {
-          try {
-            // Get user profile from database
-            const { data: profile, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single()
-
-            if (profileError) {
-              console.error('Profile error:', profileError)
-              // If profile doesn't exist or can't be accessed, create basic user from auth
-              setUser({
-                id: session.user.id,
-                email: session.user.email || '',
-                name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
-                nickname: session.user.user_metadata?.nickname
-              })
-            } else if (profile && mounted) {
-              setUser({
-                id: profile.id,
-                email: profile.email,
-                name: profile.name || undefined,
-                nickname: profile.nickname || undefined
-              })
-            }
-          } catch (profileError) {
-            console.error('Error fetching profile:', profileError)
-            // Fallback to basic user info from auth
-            if (mounted) {
-              setUser({
-                id: session.user.id,
-                email: session.user.email || '',
-                name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
-                nickname: session.user.user_metadata?.nickname
-              })
-            }
+        if (session?.user && mountedRef.current) {
+          console.log('👤 [AUTH] Usuário encontrado na sessão:', { id: session.user.id, email: session.user.email })
+          
+          const profile = await fetchUserProfile(session.user.id)
+          if (profile && mountedRef.current) {
+            setUser({
+              id: profile.id,
+              email: profile.email,
+              name: profile.name || undefined,
+              nickname: profile.nickname || undefined
+            })
+          } else if (mountedRef.current) {
+            setUser(createBasicUser(session.user))
           }
+        } else {
+          console.log('ℹ️ [AUTH] Nenhuma sessão ativa encontrada')
         }
       } catch (error) {
-        console.error('Error getting session:', error)
+        console.error('❌ [AUTH] Erro ao obter sessão:', error)
       } finally {
-        if (mounted) setLoading(false)
+        if (mountedRef.current) {
+          setLoading(false)
+          sessionCheckedRef.current = true
+        }
       }
     }
 
     getInitialSession()
 
     // Listen for auth changes
+    console.log('👂 [AUTH] Configurando listener de mudanças de auth...')
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!mounted) return
-
+        if (!mountedRef.current) return
+        
+        console.log('🔄 [AUTH] Mudança de estado detectada:', event, session ? 'com sessão' : 'sem sessão')
+        
         try {
           if (event === 'SIGNED_IN' && session?.user) {
-            // Try to get user profile, but don't fail if it doesn't work
-            try {
-              const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
-
-              if (profile && !profileError) {
-                setUser({
-                  id: profile.id,
-                  email: profile.email,
-                  name: profile.name || undefined,
-                  nickname: profile.nickname || undefined
-                })
-              } else {
-                // Fallback to auth user data
-                setUser({
-                  id: session.user.id,
-                  email: session.user.email || '',
-                  name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
-                  nickname: session.user.user_metadata?.nickname
-                })
-              }
-            } catch (profileError) {
-              console.error('Profile fetch error:', profileError)
-              // Still set user with basic info
+            console.log('✅ [AUTH] Usuário fez login:', { id: session.user.id, email: session.user.email })
+            
+            const profile = await fetchUserProfile(session.user.id)
+            if (profile && mountedRef.current) {
               setUser({
-                id: session.user.id,
-                email: session.user.email || '',
-                name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
-                nickname: session.user.user_metadata?.nickname
+                id: profile.id,
+                email: profile.email,
+                name: profile.name || undefined,
+                nickname: profile.nickname || undefined
               })
+            } else if (mountedRef.current) {
+              setUser(createBasicUser(session.user))
             }
           } else if (event === 'SIGNED_OUT') {
-            setUser(null)
+            console.log('👋 [AUTH] Usuário fez logout')
+            if (mountedRef.current) {
+              setUser(null)
+            }
           }
         } catch (error) {
-          console.error('Auth state change error:', error)
-        } finally {
-          setLoading(false)
+          console.error('❌ [AUTH] Erro na mudança de estado:', error)
         }
       }
     )
 
     return () => {
-      mounted = false
+      console.log('🧹 [AUTH] Limpando listener de auth...')
+      mountedRef.current = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [fetchUserProfile, createBasicUser])
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
+      console.log('🔐 [LOGIN] Iniciando processo de login...')
+      console.log('📧 [LOGIN] Email:', email)
+      console.log('🔑 [LOGIN] Senha:', password ? '***' : 'não fornecida')
+      
+      console.log('📡 [LOGIN] Fazendo requisição para Supabase Auth...')
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
       if (error) {
-        console.error('Login error:', error.message)
+        console.error('❌ [LOGIN] Erro retornado pelo Supabase:', error)
+        console.error('❌ [LOGIN] Código do erro:', error.status)
+        console.error('❌ [LOGIN] Mensagem do erro:', error.message)
         return false
       }
 
-      return !!data.user
+      if (data.user) {
+        console.log('✅ [LOGIN] Login bem-sucedido!')
+        console.log('👤 [LOGIN] Dados do usuário:', {
+          id: data.user.id,
+          email: data.user.email,
+          metadata: data.user.user_metadata
+        })
+        console.log('🔑 [LOGIN] Sessão criada:', !!data.session)
+        return true
+      } else {
+        console.warn('⚠️ [LOGIN] Login retornou sem usuário')
+        return false
+      }
     } catch (error) {
-      console.error('Login failed:', error)
+      console.error('❌ [LOGIN] Exceção durante login:', error)
       return false
     }
-  }
+  }, [])
 
-  const register = async (name: string, nickname: string, email: string, password: string): Promise<boolean> => {
+  const register = useCallback(async (name: string, nickname: string, email: string, password: string): Promise<boolean> => {
     try {
+      console.log('📝 [REGISTER] Iniciando processo de registro...')
+      console.log('👤 [REGISTER] Nome:', name)
+      console.log('🏷️ [REGISTER] Nickname:', nickname)
+      console.log('📧 [REGISTER] Email:', email)
+      console.log('🔑 [REGISTER] Senha:', password ? '***' : 'não fornecida')
+      
       // Register user with Supabase Auth
+      console.log('📡 [REGISTER] Fazendo requisição para Supabase Auth...')
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -177,7 +208,9 @@ export function useAuth(): AuthState {
       })
 
       if (error) {
-        console.error('Registration error:', error.message)
+        console.error('❌ [REGISTER] Erro retornado pelo Supabase:', error)
+        console.error('❌ [REGISTER] Código do erro:', error.status)
+        console.error('❌ [REGISTER] Mensagem do erro:', error.message)
         
         // Handle specific error messages
         if (error.message.includes('User already registered')) {
@@ -196,10 +229,20 @@ export function useAuth(): AuthState {
         throw new Error('Erro ao criar conta: ' + error.message)
       }
 
+      if (data.user) {
+        console.log('✅ [REGISTER] Registro bem-sucedido!')
+        console.log('👤 [REGISTER] Dados do usuário:', {
+          id: data.user.id,
+          email: data.user.email,
+          metadata: data.user.user_metadata
+        })
+        console.log('📧 [REGISTER] Confirmação necessária:', data.user.email_confirmed_at ? 'não' : 'sim')
+      }
+
       // If user was created successfully, the trigger will handle profile creation
       return !!data.user
     } catch (error) {
-      console.error('Registration failed:', error)
+      console.error('❌ [REGISTER] Exceção durante registro:', error)
       
       // Re-throw the error so the component can handle it
       if (error instanceof Error) {
@@ -208,16 +251,20 @@ export function useAuth(): AuthState {
       
       throw new Error('Erro ao criar conta. Tente novamente.')
     }
-  }
+  }, [])
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
+      console.log('👋 [LOGOUT] Iniciando logout...')
       await supabase.auth.signOut()
-      setUser(null)
+      console.log('✅ [LOGOUT] Logout bem-sucedido')
+      if (mountedRef.current) {
+        setUser(null)
+      }
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error('❌ [LOGOUT] Erro durante logout:', error)
     }
-  }
+  }, [])
 
   return { user, loading, login, logout, register }
 }

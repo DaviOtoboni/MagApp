@@ -13,7 +13,7 @@ function LoginContent() {
   
   const redirectTo = searchParams?.get('redirectTo') || '/dashboard'
 
-  // Redirect authenticated users
+  // Redirect authenticated users only when loading finishes
   useEffect(() => {
     if (!loading && user) {
       router.replace(redirectTo)
