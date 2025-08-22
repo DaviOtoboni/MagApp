@@ -143,108 +143,19 @@ class LocalStorage {
 
     // Dados de exemplo para mangás
     if (!hasMangas) {
-      const mangasExemplo: Omit<Manga, "id" | "createdAt" | "updatedAt">[] = [
-        {
-          titulo: "One Piece",
-          capa: "/one-piece-manga-cover.png",
-          capitulosTotal: 1100,
-          capituloAtual: 850,
-          status: "lendo",
-          finalizado: false,
-          pretendeContinuar: true,
-          notas: "Saga incrível! Esperando ansiosamente pelos próximos capítulos.",
-        },
-        {
-          titulo: "Attack on Titan",
-          capa: "/attack-on-titan-manga-cover.png",
-          capitulosTotal: 139,
-          capituloAtual: 139,
-          status: "completo",
-          finalizado: true,
-          pretendeContinuar: false,
-          notas: "Final épico! Uma das melhores histórias que já li.",
-        },
-        {
-          titulo: "Demon Slayer",
-          capa: "/demon-slayer-manga-cover.png",
-          capitulosTotal: 205,
-          capituloAtual: 100,
-          status: "pausado",
-          finalizado: true,
-          pretendeContinuar: true,
-          notas: "Pausei para assistir o anime primeiro.",
-        },
-      ]
-
+      const mangasExemplo: Omit<Manga, "id" | "createdAt" | "updatedAt">[] = []
       mangasExemplo.forEach((manga) => this.create("mangas", manga))
     }
 
     // Dados de exemplo para animes
     if (!hasAnimes) {
-      const animesExemplo: Omit<Anime, "id" | "createdAt" | "updatedAt">[] = [
-        {
-          titulo: "Attack on Titan",
-          capa: "/attack-on-titan-anime-cover.png",
-          episodiosTotal: 75,
-          episodioAtual: 75,
-          status: "completo",
-          finalizado: true,
-          pretendeContinuar: false,
-          notas: "Adaptação perfeita do mangá. Animação espetacular!",
-        },
-        {
-          titulo: "Demon Slayer",
-          capa: "/demon-slayer-manga-cover.png",
-          episodiosTotal: 44,
-          episodioAtual: 30,
-          status: "assistindo",
-          finalizado: false,
-          pretendeContinuar: true,
-          notas: "Animação da Ufotable é de outro nível!",
-        },
-      ]
-
+      const animesExemplo: Omit<Anime, "id" | "createdAt" | "updatedAt">[] = []
       animesExemplo.forEach((anime) => this.create("animes", anime))
     }
 
     // Dados de exemplo para jogos
     if (!hasJogos) {
-      const jogosExemplo: Omit<Jogo, "id" | "createdAt" | "updatedAt">[] = [
-        {
-          titulo: "The Legend of Zelda: Breath of the Wild",
-          capa: "/zelda-botw-cover.png",
-          horasJogadas: 120,
-          horasTotal: 150,
-          status: "jogando",
-          finalizado: true,
-          pretendeContinuar: true,
-          plataforma: "Nintendo Switch",
-          notas: "Jogo incrível com mundo aberto fantástico!",
-        },
-        {
-          titulo: "Persona 5 Royal",
-          capa: "/persona5-royal-cover.png",
-          horasJogadas: 80,
-          horasTotal: 100,
-          status: "completo",
-          finalizado: true,
-          pretendeContinuar: false,
-          plataforma: "PlayStation 5",
-          notas: "História envolvente e personagens marcantes.",
-        },
-        {
-          titulo: "Elden Ring",
-          capa: "/elden-ring-cover.png",
-          horasJogadas: 45,
-          horasTotal: 80,
-          status: "pausado",
-          finalizado: true,
-          pretendeContinuar: true,
-          plataforma: "PC",
-          notas: "Muito difícil, mas vale a pena.",
-        },
-      ]
-
+      const jogosExemplo: Omit<Jogo, "id" | "createdAt" | "updatedAt">[] = []
       jogosExemplo.forEach((jogo) => this.create("jogos", jogo))
     }
   }

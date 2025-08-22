@@ -8,55 +8,18 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
-import { Plus, Search, Filter, Clock, Trophy, Gamepad2 } from "lucide-react"
+import { Plus, Search, Filter, Clock, Trophy, Gamepad2, X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
 // Dados de exemplo
-const jogosExemplo = [
-  {
-    id: 1,
-    titulo: "The Legend of Zelda: Breath of the Wild",
-    capa: "/zelda-botw-cover.png",
-    horasJogadas: 120,
-    horasTotal: 150,
-    status: "jogando" as const,
-    finalizado: true,
-    pretendeContinuar: true,
-    plataforma: "Nintendo Switch",
-    notas: "Jogo incrível com mundo aberto fantástico!",
-  },
-  {
-    id: 2,
-    titulo: "Persona 5 Royal",
-    capa: "/persona5-royal-cover.png",
-    horasJogadas: 80,
-    horasTotal: 100,
-    status: "completo" as const,
-    finalizado: true,
-    pretendeContinuar: false,
-    plataforma: "PlayStation 5",
-    notas: "História envolvente e personagens marcantes.",
-  },
-  {
-    id: 3,
-    titulo: "Elden Ring",
-    capa: "/elden-ring-cover.png",
-    horasJogadas: 45,
-    horasTotal: 80,
-    status: "pausado" as const,
-    finalizado: true,
-    pretendeContinuar: true,
-    plataforma: "PC",
-    notas: "Muito difícil, mas vale a pena.",
-  },
-]
+const jogosExemplo = []
 
 const statusConfig = {
   jogando: { label: "Jogando", color: "bg-special text-special-foreground", icon: Gamepad2 },
   completo: { label: "Completo", color: "bg-green-500 text-white", icon: Trophy },
   pausado: { label: "Pausado", color: "bg-yellow-500 text-white", icon: Clock },
-  dropado: { label: "Dropado", color: "bg-red-500 text-white", icon: Clock },
+  dropado: { label: "Dropado", color: "bg-red-500 text-white", icon: X },
 }
 
 export default function JogosPage() {

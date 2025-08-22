@@ -26,38 +26,7 @@ interface Manga {
 }
 
 // Dados de exemplo (será substituído por dados reais depois)
-const mangasExemplo: Manga[] = [
-  {
-    id: "1",
-    titulo: "One Piece",
-    capa: "/one-piece-manga-cover.png",
-    capitulosTotal: 1100,
-    capituloAtual: 850,
-    status: "lendo",
-    finalizado: false,
-    pretendeContinuar: true,
-  },
-  {
-    id: "2",
-    titulo: "Attack on Titan",
-    capa: "/attack-on-titan-manga-cover.png",
-    capitulosTotal: 139,
-    capituloAtual: 139,
-    status: "completo",
-    finalizado: true,
-    pretendeContinuar: false,
-  },
-  {
-    id: "3",
-    titulo: "Demon Slayer",
-    capa: "/demon-slayer-manga-cover.png",
-    capitulosTotal: 205,
-    capituloAtual: 45,
-    status: "pausado",
-    finalizado: true,
-    pretendeContinuar: true,
-  },
-]
+const mangasExemplo: Manga[] = []
 
 const statusConfig = {
   lendo: { label: "Lendo", color: "bg-primary text-primary-foreground", icon: Eye },

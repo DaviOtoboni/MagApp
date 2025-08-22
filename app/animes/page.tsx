@@ -26,38 +26,7 @@ interface Anime {
 }
 
 // Dados de exemplo (será substituído por dados reais depois)
-const animesExemplo: Anime[] = [
-  {
-    id: "1",
-    titulo: "Attack on Titan",
-    capa: "/attack-on-titan-anime-cover.png",
-    episodiosTotal: 87,
-    episodioAtual: 87,
-    status: "completo",
-    finalizado: true,
-    pretendeContinuar: false,
-  },
-  {
-    id: "2",
-    titulo: "Demon Slayer",
-    capa: "/demon-slayer-anime-cover.png",
-    episodiosTotal: 44,
-    episodioAtual: 32,
-    status: "assistindo",
-    finalizado: false,
-    pretendeContinuar: true,
-  },
-  {
-    id: "3",
-    titulo: "Jujutsu Kaisen",
-    capa: "/jujutsu-kaisen-anime-cover.png",
-    episodiosTotal: 24,
-    episodioAtual: 15,
-    status: "pausado",
-    finalizado: false,
-    pretendeContinuar: true,
-  },
-]
+const animesExemplo: Anime[] = []
 
 const statusConfig = {
   assistindo: { label: "Assistindo", color: "bg-accent text-accent-foreground", icon: Eye },
