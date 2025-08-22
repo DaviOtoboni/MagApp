@@ -12,6 +12,22 @@ import { Plus, Search, Filter, Clock, Trophy, Gamepad2, X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
+// Interface para Jogo
+interface Jogo {
+  id: string | number
+  titulo: string
+  capa: string
+  status: "jogando" | "completo" | "pausado" | "dropado"
+  finalizado: boolean
+  pretendeContinuar: boolean
+  notas?: string
+  horasTotal: number
+  horasJogadas: number
+  plataforma: string
+}
+
+// Dados de exemplo
+const jogosExemplo: Jogo[] = []
 
 const statusConfig = {
   jogando: { label: "Jogando", color: "bg-special text-special-foreground", icon: Gamepad2 },
