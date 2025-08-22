@@ -12,8 +12,6 @@ import { Plus, Search, Filter, Clock, Trophy, Gamepad2, X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
-// Dados de exemplo
-const jogosExemplo = []
 
 const statusConfig = {
   jogando: { label: "Jogando", color: "bg-special text-special-foreground", icon: Gamepad2 },

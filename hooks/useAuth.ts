@@ -63,7 +63,10 @@ export function useAuth(): AuthState {
         // Check if Supabase is configured
         if (!isSupabaseConfigured) {
           console.warn('⚠️ [AUTH] Supabase não configurado, pulando verificação de auth')
-          if (mountedRef.current) setLoading(false)
+          if (mountedRef.current) {
+            setLoading(false)
+            setUser(null)
+          }
           return
         }
 
@@ -72,7 +75,10 @@ export function useAuth(): AuthState {
         
         if (sessionError) {
           console.error('❌ [AUTH] Erro ao buscar sessão:', sessionError)
-          if (mountedRef.current) setLoading(false)
+          if (mountedRef.current) {
+            setLoading(false)
+            setUser(null)
+          }
           return
         }
         
@@ -95,6 +101,10 @@ export function useAuth(): AuthState {
         }
       } catch (error) {
         console.error('❌ [AUTH] Erro ao obter sessão:', error)
+        if (mountedRef.current) {
+          setLoading(false)
+          setUser(null)
+        }
       } finally {
         if (mountedRef.current) {
           setLoading(false)
@@ -136,6 +146,9 @@ export function useAuth(): AuthState {
           }
         } catch (error) {
           console.error('❌ [AUTH] Erro na mudança de estado:', error)
+          if (mountedRef.current) {
+            setUser(null)
+          }
         }
       }
     )
